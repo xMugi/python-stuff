@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from bs4 import BeautifulSoup
 
+#change id to your game, get from steamdb then appid of the game
 game_id = "281990"
 
 colors = dict(END='\033[0m', BLACK='\033[30m', RED='\033[31m', GREEN='\033[32m', YELLOW='\033[33m', BLUE='\033[34m',
