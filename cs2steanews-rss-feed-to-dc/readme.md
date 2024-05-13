@@ -1,0 +1,1 @@
+cavemen - python script to take cs2 steam news rss feed and post it to an discord channel via webhook
