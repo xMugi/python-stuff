@@ -209,16 +209,16 @@ def check_updates(urls, last_updated):
         print(colors['GREEN'] + "No previous update records found. Marking all URLs as updated." + colors['END'])
         for url in urls:
             updated_dates[url] = {"date": datetime.now().strftime('%Y-%m-%d %H:%M:%S'), "name": None}
-    else:
-        for url in urls:
-            print(colors['CYAN'] + f"Checking {format_url(url)}..." + colors['END'])
-            processed, is_success = process_url(url, last_updated, updated_dates, updated_ids)
-            if processed:
-                if is_success:
-                    upd_cnt += 1
-                else:
-                    upd_cnt_err += 1
-                log_update_message(is_success, updated_dates[url]['name'], url.split('=')[-1])
+
+    for url in urls:
+        print(colors['CYAN'] + f"Checking {format_url(url)}..." + colors['END'])
+        processed, is_success = process_url(url, last_updated, updated_dates, updated_ids)
+        if processed:
+            if is_success:
+                upd_cnt += 1
+            else:
+                upd_cnt_err += 1
+            log_update_message(is_success, updated_dates[url]['name'], url.split('=')[-1])
 
     if upd_cnt_err > 0:  # Only print if there were failed checks
         print(colors['RED'] + f"{upd_cnt_err} Mods Failed to check ✘" + colors['END'])
