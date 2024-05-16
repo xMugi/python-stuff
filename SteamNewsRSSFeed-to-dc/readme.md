@@ -1,6 +1,13 @@
-cavemen - python script to take steam news rss feed and post it to an discord channel via webhook
+# Cavemen Python script
 
+A Python script to take Steam news RSS feed and post it to a Discord channel via a webhook.
 
-todo?
-make it so last_links wont get wiped everytime theres a new post, so it saves like last 10 links it posted, instead of only the newest, idk why but sounds nice
-also mayb restructure so it uses config.json instead for better structure
+## Features
+
+- Fetches Steam news from RSS feed.
+- Posts news updates to a specified Discord channel using a webhook.
+
+## TODO
+
+- **Save Last Links**: Modify the script to save the last 10 links it posted instead of only the newest one.
+- **Configuration File**: Restructure the script to use a `config.json` file for better configuration management.
