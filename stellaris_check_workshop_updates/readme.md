@@ -17,14 +17,14 @@ A Python script to check if items from a list of Steam Workshop URLs have been u
     - On line 6, replace `game_id` with the Steam AppID from the Game. The default ID is set for Stellaris.
 - **`url_mod_collection.json`**: 
     - Supports multiple URLs. Expand the list and ensure each URL is enclosed in `""`.
-- **`updated_entrys.json`**: 
+- **`updated_entrys.json`**:
+    - This files saves all Workshop Entrys with their names and Dates when they got Last Updated.
     - Must include `{}` as its content. Do not make any changes to this structure.
 
 ### Important
 
 - The script will crash if any of the following files are missing:
   - `url_mod_collection.json`
-  - `updated_entrys.json`
 
 ## Usage
 
