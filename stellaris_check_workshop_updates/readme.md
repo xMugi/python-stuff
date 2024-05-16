@@ -30,7 +30,6 @@ A Python script to check if items from a list of Steam Workshop URLs have been u
 
 1. Ensure the following files are present and correctly configured:
     - `url_mod_collection.json`
-    - `updated_entrys.json`
 
 2. Run the script:
     ```bash
