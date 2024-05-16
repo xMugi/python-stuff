@@ -12,7 +12,7 @@ rssfeed = "https://store.steampowered.com/feeds/news/app/730/?cc=DE&l=english"
 
 
 ## Embed
-# Color for Sideline, Put Value as Decimal, for example from spycolor.com
+# Color for Sideline, Put Value as Decimal, for example from SpyColor.com
 embeds_color = 16750848
 
 # Game Name? aka will show as author in Embeds (the Footer)
@@ -54,8 +54,9 @@ def parse_rss(rss_content):
 
         # Handle <img> tags by replacing them with placeholder text
         desc_soup = BeautifulSoup(description, "html.parser")
-        for img in desc_soup.find_all('img'):
-            img.replace_with("<--check image on news site-->")
+
+        # """for img in desc_soup.find_all('img'):"""
+        #    img.replace_with("<--check image on news site-->")
 
         # Replace <br> tags with additional newlines
         formatted_description = desc_soup.get_text(separator='\n\n')
