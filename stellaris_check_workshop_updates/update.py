@@ -2,8 +2,9 @@ import requests
 import json
 from datetime import datetime
 from bs4 import BeautifulSoup
+import os
 
-#change id to your game, get from steamdb then appid of the game
+# change id to your game, get from steam-db then AppID of the game
 game_id = "281990"
 
 colors = dict(END='\033[0m', BLACK='\033[30m', RED='\033[31m', GREEN='\033[32m', YELLOW='\033[33m', BLUE='\033[34m',
@@ -14,7 +15,7 @@ colors = dict(END='\033[0m', BLACK='\033[30m', RED='\033[31m', GREEN='\033[32m',
 # File paths
 url_collection = 'url_mod_collection.json'
 last_updated_file = 'updated_entrys.json'
-updated_file = 'updated.json'
+updated_file = 'updated.txt'
 
 
 def format_title(title):
@@ -23,6 +24,10 @@ def format_title(title):
 
 def format_workshop_id(workshop_id):
     return f"{colors['BT_MAGENTA']}{workshop_id}{colors['END']}"
+
+
+def format_url(url):
+    return f"{colors['BT_MAGENTA']}{url}{colors['END']}"
 
 
 def get_last_updated():
@@ -34,19 +39,31 @@ def get_last_updated():
 
 
 def get_updated_ids():
+    if not os.path.exists(updated_file):
+        print(colors['RED'] + f"Error: {updated_file} file not found. Creating a new file." + colors['END'])
+        with open(updated_file, 'w') as f:
+            f.write('')
+        return {}
+
     try:
         with open(updated_file, 'r') as f:
-            data = f.read()
-            if data.strip():  # Check if the file is not empty
-                return json.loads(data)
+            data = f.read().strip()
+            if data:  # Check if the file is not empty
+                updated_ids = {}
+                for line in data.split('\n'):
+                    updated_ids[line.strip()] = None  # Assuming each line is a key
+                return updated_ids
             else:
                 return {}
-    except FileNotFoundError:
-        print(colors['RED'] + f"Error: {updated_file} file not found." + colors['END'])
+    except Exception as e:
+        print(colors['RED'] + f"Error: {e}" + colors['END'])
         return {}
-    except json.JSONDecodeError:
-        print(colors['RED'] + f"Error: JSON Decode failed {updated_file}. JSON Format may be wrong." + colors['END'])
-        return {}
+
+
+def update_updated_ids(updated_ids):
+    with open(updated_file, 'w') as f:
+        for key in updated_ids.keys():
+            f.write(f'{key}\n')
 
 
 def update_last_updated(updated_data):
@@ -62,12 +79,6 @@ def update_last_updated(updated_data):
     # Save the updated last_updated dictionary to the JSON file
     with open(last_updated_file, 'w') as file:
         json.dump(last_updated, file, indent=4)
-
-
-def update_updated_ids(updated_ids):
-    with open(updated_file, 'w') as f:
-        for key in updated_ids.keys():
-            f.write(f'{key}\n')
 
 
 def fetch_page(url):
@@ -107,7 +118,7 @@ def parse_date(date_str):
     # Normalize spaces and correct AM/PM casing
     date_str = date_str.strip().replace('am', 'AM').replace('pm', 'PM')
 
-    # Caveman fix: Replace "29 Feb" with "28 Feb" directly without considering leap year status
+    # Caveman fix: Replace "29 Feb" with "27 Feb" directly without considering leap year status
     date_str = date_str.replace("29 Feb", "28 Feb")
 
     formats = [
@@ -154,42 +165,61 @@ def check_and_update(url):
     return {"date": None, "name": None}  # Default values if content fetch fails
 
 
+def log_update_message(is_success, title, workshop_id):
+    if is_success:
+        print(colors['GREEN'] +
+              f"✓ Updated: {format_title(title)}"
+              + colors['GREEN'] +
+              f" - Workshop ID: {format_workshop_id(workshop_id)}\n"
+              + colors['END'])
+    else:
+        print(colors['RED'] +
+              f"? Failed to check: {format_title(title)}"
+              + colors['RED'] +
+              f" - Workshop ID: {format_workshop_id(workshop_id)}\n"
+              + colors['END'])
+
+
+def process_url(url, last_updated, updated_dates, updated_ids):
+    workshop_id = url.split('=')[-1]
+    result = check_and_update(url)
+    title = result['name']
+    if result['date']:
+        if last_updated.get(url) and last_updated[url].get('date') == result['date']:
+            return False, False  # No update
+        updated_dates[url] = {"date": result['date'], "name": title}
+        process_update(url, workshop_id, result, updated_dates, updated_ids)
+        return True, True  # Successful update
+    else:
+        return True, False  # Failed check
+
+
 def check_updates(urls, last_updated):
     updated_ids = get_updated_ids()
     updated_dates = {}
+    upd_cnt = 0  # Initialize the counter for updated URLs
+    upd_cnt_err = 0  # Initialize the counter for failed checks
+
     if not last_updated:
         print(colors['GREEN'] + "No previous update records found. Marking all URLs as updated." + colors['END'])
         for url in urls:
-            # Ensuring every entry is a dictionary with 'date' and 'name'
             updated_dates[url] = {"date": datetime.now().strftime('%Y-%m-%d %H:%M:%S'), "name": None}
     else:
         for url in urls:
-            print(colors['CYAN'] + f"Checking {url}..." + colors['END'])
-            workshop_id = url.split('=')[-1]
-            result = check_and_update(url)
-            title = result['name']
-            if result['date']:
-                if last_updated.get(url) and last_updated[url].get('date') == result['date']:
-                    continue
-                    # print(colors['YELLOW'] +
-                    #       f"✘ No Updates: {format_title(title)}\n"
-                    #       + colors['YELLOW'] +
-                    #       f" - Workshop ID: {format_workshop_id(workshop_id)}\n"
-                    #       + colors['END'])
-                else:  # not last_updated.get(url) and last_updated[url].get('date') == result['date']:
-                    updated_dates[url] = {"date": result['date'], "name": title}
-                    process_update(url, workshop_id, result, updated_dates, updated_ids)
-                    print(colors['GREEN'] +
-                          f"✓ Updated: {format_title(title)}"
-                          + colors['GREEN'] +
-                          f" - Workshop ID: {format_workshop_id(workshop_id)}\n"
-                          + colors['END'])
-            else:
-                print(colors['RED'] +
-                      f"? Failed to check: {format_title(title)}"
-                      + colors['RED'] +
-                      f" - Workshop ID: {format_workshop_id(workshop_id)}\n"
-                      + colors['END'])
+            print(colors['CYAN'] + f"Checking {format_url(url)}..." + colors['END'])
+            processed, is_success = process_url(url, last_updated, updated_dates, updated_ids)
+            if processed:
+                if is_success:
+                    upd_cnt += 1
+                else:
+                    upd_cnt_err += 1
+                log_update_message(is_success, updated_dates[url]['name'], url.split('=')[-1])
+
+    if upd_cnt_err > 0:  # Only print if there were failed checks
+        print(colors['RED'] + f"{upd_cnt_err} Mods Failed to check ✘" + colors['END'])
+    if upd_cnt > 0:  # Only print if there were updates
+        print(colors['GREEN'] + f"{upd_cnt} Mod{'s' if upd_cnt > 1 else ''} got an Update ✓\n" + colors['END'])
+
     return updated_dates, updated_ids
 
 
