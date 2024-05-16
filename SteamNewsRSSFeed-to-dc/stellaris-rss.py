@@ -54,8 +54,9 @@ def parse_rss(rss_content):
 
         # Handle <img> tags by replacing them with placeholder text
         desc_soup = BeautifulSoup(description, "html.parser")
-        for img in desc_soup.find_all('img'):
-            img.replace_with("<--check image on news site-->")
+
+        #for img in desc_soup.find_all('img'):
+        #    img.replace_with("<--check image on news site-->")
 
         # Replace <br> tags with additional newlines
         formatted_description = desc_soup.get_text(separator='\n\n')
