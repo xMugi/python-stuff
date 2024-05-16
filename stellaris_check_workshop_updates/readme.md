@@ -1,10 +1,47 @@
-pip install -r requirements.txt
+# Steam Workshop Updater
 
-update.py - inside the .py on line:6 replace game_id /w steamgameid (default stellaris id)
-also
+A Python script to check if items from a list of Steam Workshop URLs have been updated.
 
-url_mod_collection.json - multiple urls supported just expand the list and make sure url is between ""
+## Installation
 
-updated_entrys.json - needs {} so dont change anything
+1. Install the required dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-also without any of the 3 json it crashes, soooooo 
+## Configuration
+
+### Files
+
+- **`update.py`**: 
+    - On line 6, replace `game_id` with the Steam AppID from the Game. The default ID is set for Stellaris.
+- **`url_mod_collection.json`**: 
+    - Supports multiple URLs. Expand the list and ensure each URL is enclosed in `""`.
+- **`updated_entrys.json`**: 
+    - Must include `{}` as its content. Do not make any changes to this structure.
+
+### Important
+
+- The script will crash if any of the following files are missing:
+  - `url_mod_collection.json`
+  - `updated_entrys.json`
+
+## Usage
+
+1. Ensure the following files are present and correctly configured:
+    - `url_mod_collection.json`
+    - `updated_entrys.json`
+
+2. Run the script:
+    ```bash
+    python update.py
+    ```
+
+## Example `url_mod_collection.json`
+
+```json
+[
+    "http://steamcommunity.com/sharedfiles/filedetails/?id=123456789",
+    "http://steamcommunity.com/sharedfiles/filedetails/?id=987654321",
+    "http://steamcommunity.com/sharedfiles/filedetails/?id=987654321"
+]
