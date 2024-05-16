@@ -31,6 +31,11 @@ def format_url(url):
 
 
 def get_last_updated():
+    if not os.path.exists(last_updated_file):
+        with open(last_updated_file, 'w') as f:
+            json.dump({}, f)
+        return {}
+
     try:
         with open(last_updated_file, 'r') as f:
             return json.load(f)
