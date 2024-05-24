@@ -4,7 +4,7 @@ A Python script to fetch Steam news from an RSS feed and post it to a Discord ch
 
 ## Features
 
-- Fetches Game news from a Steam RSS feed.
+- Fetches Game news from a Steam RSS News feed.
 - Saves the last 10 posted links.
 - Posts news updates to a specified Discord channel using a webhook.
 - Configuration managed through a `config.json` file for easy setup.
