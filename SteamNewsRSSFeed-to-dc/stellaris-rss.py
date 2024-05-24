@@ -1,23 +1,25 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+import os
+import json
 
-## Global Variables ###
-# Discord Web hook
-dcwebhook = ""
+# Get the directory of the script file
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Rss Feed link
-rssfeed = "https://store.steampowered.com/feeds/news/app/281990/?cc=DE&l=english"
+# Path to config file
+config_path = os.path.join(script_dir, 'config.json')
 
-## Embed
-# Color for Sideline, Put Value as Decimal, for example from SpyColor.com
-embeds_color = 8054015
+# Load configuration from config.json
+with open(config_path, 'r') as config_file:
+    config = json.load(config_file)
 
-# Game Name? aka will show as author in Embeds (the Footer)
-gamename = "Stellaris News Feed"
-
-# Author Icon URL
-author_icon = 'http://i.epvpimg.com/Cpx0fab.png'
+## Global Variables from config.json ###
+dcwebhook = config['dcwebhook']
+rssfeed = config['rssfeed']
+embeds_color = config['embeds_color']
+gamename = config['gamename']
+author_icon = config['author_icon']
 
 ### Script
 # Links inside this File won't get posted
@@ -28,6 +30,7 @@ def fetch_rss(url):
     """Fetch the content of the RSS feed."""
     response = requests.get(url)
     return response.content
+
 
 def parse_rss(rss_content):
     """Parse the RSS content to extract the latest news item."""
@@ -55,9 +58,10 @@ def parse_rss(rss_content):
         return link, title, formatted_description, formatted_date
     return None, None, None, None
 
+
 def send_to_discord(webhook_url, title, description, link, pub_date):
     """Send a single message to the specified Discord webhook using embeds with careful splitting."""
-    max_length = 1900
+    max_length = 5000
     description_chunks = []
 
     while len(description) > max_length:
@@ -91,6 +95,7 @@ def send_to_discord(webhook_url, title, description, link, pub_date):
         response = requests.post(webhook_url, json=data)
         print("Posted to Discord:", response.status_code)
 
+
 def read_last_links():
     """Read the last posted links from a file and return them as a list."""
     file_path = os.path.join(script_dir, links_posted)
@@ -100,6 +105,7 @@ def read_last_links():
     except FileNotFoundError:
         return []
 
+
 def save_last_links(link):
     """Save the last posted links to a file, keeping only the most recent 10."""
     file_path = os.path.join(script_dir, links_posted)
@@ -108,6 +114,7 @@ def save_last_links(link):
     links = links[:10]  # Keep only the last 10 links
     with open(file_path, "w") as file:
         file.write('\n'.join(links))
+
 
 def main():
     rss_url = f'{rssfeed}'
@@ -122,6 +129,7 @@ def main():
         save_last_links(link)
     else:
         print("No new link to post or duplicate found.")
+
 
 if __name__ == "__main__":
     main()
