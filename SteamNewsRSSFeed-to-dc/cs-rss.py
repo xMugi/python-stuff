@@ -32,7 +32,6 @@ def fetch_rss(url):
     response = requests.get(url)
     return response.content
 
-
 def parse_rss(rss_content):
     """Parse the RSS content to extract the latest news item."""
     soup = BeautifulSoup(rss_content, 'lxml-xml')
@@ -54,16 +53,10 @@ def parse_rss(rss_content):
 
         # Handle <img> tags by replacing them with placeholder text
         desc_soup = BeautifulSoup(description, "html.parser")
-
-        # """for img in desc_soup.find_all('img'):"""
-        #    img.replace_with("<--check image on news site-->")
-
-        # Replace <br> tags with additional newlines
         formatted_description = desc_soup.get_text(separator='\n\n')
 
         return link, title, formatted_description, formatted_date
     return None, None, None, None
-
 
 def send_to_discord(webhook_url, title, description, link, pub_date):
     """Send a single message to the specified Discord webhook using embeds with careful splitting."""
@@ -101,36 +94,37 @@ def send_to_discord(webhook_url, title, description, link, pub_date):
         response = requests.post(webhook_url, json=data)
         print("Posted to Discord:", response.status_code)
 
-
-def read_last_link():
-    """Read the last posted link from a file."""
+def read_last_links():
+    """Read the last posted links from a file and return them as a list."""
+    file_path = os.path.join(script_dir, links_posted)
     try:
-        with open(links_posted, "r") as file:
-            return file.read().strip()
+        with open(file_path, "r") as file:
+            return file.read().strip().split('\n')
     except FileNotFoundError:
-        return None
+        return []
 
-
-def save_last_link(link):
-    """Save the last posted link to a file."""
-    with open(links_posted, "w") as file:
-        file.write(link)
-
+def save_last_links(link):
+    """Save the last posted links to a file, keeping only the most recent 10."""
+    file_path = os.path.join(script_dir, links_posted)
+    links = read_last_links()
+    links.insert(0, link)  # Insert the new link at the beginning
+    links = links[:10]  # Keep only the last 10 links
+    with open(file_path, "w") as file:
+        file.write('\n'.join(links))
 
 def main():
     rss_url = f'{rssfeed}'
     webhook_url = f'{dcwebhook}'
 
-    last_link = read_last_link()
+    last_links = read_last_links()
     rss_content = fetch_rss(rss_url)
     link, title, description, pub_date = parse_rss(rss_content)
 
-    if link and link != last_link:
+    if link and link not in last_links:
         send_to_discord(webhook_url, title, description, link, pub_date)
-        save_last_link(link)
+        save_last_links(link)
     else:
         print("No new link to post or duplicate found.")
-
 
 if __name__ == "__main__":
     main()
