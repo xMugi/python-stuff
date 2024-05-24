@@ -1,4 +1,4 @@
-# Cavemen Python Script
+# Cavemen Python RSS Feed Script
 
 A Python script to fetch Steam news from an RSS feed and post it to a Discord channel via a webhook.
 
