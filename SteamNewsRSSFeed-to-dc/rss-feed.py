@@ -20,6 +20,7 @@ rssfeed = config['rssfeed']
 embeds_color = config['embeds_color']
 gamename = config['gamename']
 author_icon = config['author_icon']
+latest_news = config['latest_news']
 
 ### Script
 # Links inside this File won't get posted
@@ -38,7 +39,7 @@ def parse_rss(rss_content):
     items = soup.find_all('item')
 
     if len(items) > 1:
-        latest_item = items[0]  # Get the first/latest item
+        latest_item = items[latest_news]  # Get the first/latest item
         title = latest_item.find('title').text if latest_item.find('title') else "No Title"
         description = latest_item.find('description').text if latest_item.find('description') else "No Description"
         link = latest_item.find('link').text if latest_item.find('link') else "No Link"
