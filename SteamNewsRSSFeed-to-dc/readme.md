@@ -20,6 +20,7 @@ The script uses a `config.json` file for settings, which includes the Discord we
   "dcwebhook": "your_discord_webhook_url",  // The URL of the Discord webhook
   "rssfeed": "steam_rss_feed_url",          // The URL of the Steam RSS feed
   "embeds_color": 16750848,                 // The color of the embed's sideline in decimal value (use SpyColor.com for conversion)
-  "gamename": "gamename_below_embed",       // The game name to display at the end of the embed along with the post date
-  "author_icon": "direct_image_link"        // A direct URL to an image (ending in .jpg, .jpeg, or .png) to show as an author icon
+  "gamename": "gamename",                   // The game name to display at the bottom of the embed along with the post date
+  "author_icon": "direct_image_link",       // A direct URL to an image (ending in .jpg, .jpeg, or .png) to show as an author icon
+  "latest_news": 0                          // 0 = latest news , 1 = Previous News Entry
 }
