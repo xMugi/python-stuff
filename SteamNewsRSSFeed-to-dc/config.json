@@ -4,4 +4,6 @@
   "embeds_color": 16750848,
   "gamename": "gamename_below_embed",
   "author_icon": "your_direct_image_url"
+  "____news__comment": "0=latest entry",
+  "latest_news": 0
 }
